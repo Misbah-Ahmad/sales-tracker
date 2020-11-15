@@ -1,13 +1,15 @@
-import { Menu } from "antd";
-import { Header } from "antd/lib/layout/layout";
-
+import { Layout, Menu } from "antd";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Navbar = () => {
+  const { Header } = Layout;
+  const { isLoggedIn } = useContext(AuthContext);
+
   return (
-    <Header className="header">
-      <div className="logo" style={{ color: "#fff" }} />
+    <Header className="site-layout-background" style={{ padding: 0 }}>
       <Menu style={{ textAlign: "right" }} theme="dark" mode="horizontal">
-        <Menu.Item key="1">Login</Menu.Item>
+        <Menu.Item key="1">{isLoggedIn ? "Logout" : "Login"}</Menu.Item>
         <Menu.Item key="2">About</Menu.Item>
         <Menu.Item key="3">Contact</Menu.Item>
       </Menu>

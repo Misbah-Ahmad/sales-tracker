@@ -1,10 +1,10 @@
-import { Footer } from "antd/lib/layout/layout";
+import { Layout } from "antd";
 
 const SiteFooter = () => {
+  const { Footer } = Layout;
+  
   return (
-    <Footer style={{ textAlign: "center" }}>
-      Created by @bugIsEverywhere
-    </Footer>
+    <Footer style={{ textAlign: "center" }}>Created by @bugIsEverywhere</Footer>
   );
 };
 

@@ -1,11 +1,17 @@
+import { Layout } from "antd";
+
 const Main = () => {
+  const { Content } = Layout;
+  
   return (
-    <div
-      className="site-layout-background"
-      style={{ padding: 24, minHeight: 360 }}
-    >
-      Bill is a cat.
-    </div>
+    <Content style={{ margin: "0 16px" }}>
+      <div
+        className="site-layout-background"
+        style={{ padding: 24, minHeight: 360 }}
+      >
+        Bill is a cat.
+      </div>
+    </Content>
   );
 };
 
