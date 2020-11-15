@@ -1,13 +1,25 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { getIsLoggedIn, getLoggedInUser, saveIsLoggedIn, saveLoggedInUserInfo } from "../Data/repo";
 
 export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(getIsLoggedIn());
+    useEffect(() => {
+        saveIsLoggedIn(isLoggedIn);
+        if (!isLoggedIn) {
+            setLoggedInUser(null);
+        }
+    }, [ isLoggedIn ]);
 
-    return ( 
-        <AuthContext.Provider value={{isLoggedIn, setIsLoggedIn}}>
+    const [loggedInUser, setLoggedInUser] = useState(getLoggedInUser());
+    useEffect(() => {
+        saveLoggedInUserInfo(loggedInUser);
+    }, [loggedInUser])
+
+    return (
+        <AuthContext.Provider value={{isLoggedIn, setIsLoggedIn, loggedInUser, setLoggedInUser}}>
             {props.children}
         </AuthContext.Provider>
      );
