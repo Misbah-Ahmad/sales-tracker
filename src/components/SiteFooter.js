@@ -1,10 +1,11 @@
-import { Layout } from "antd";
+import { Row } from "antd";
 
 const SiteFooter = () => {
-  const { Footer } = Layout;
   
   return (
-    <Footer style={{ textAlign: "center" }}>Created by @bugIsEverywhere</Footer>
+    <Row style={{ background: '#001529', color: '#fff', fontWeight: 600}} justify="space-around">
+      <div style={{ margin: '8px auto' }}>Created by @bugIsEverywhere</div>
+    </Row>
   );
 };
 

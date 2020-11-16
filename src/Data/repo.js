@@ -22,7 +22,10 @@ export const getLoggedInUser = () => {
     return getIsLoggedIn() && user?.username ? user : null;
 }
 
-export const authorizeUser = (username, password) => {
+export const authorizeUser = async (username, password) => {
+    console.log('before sleep');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('after sleep');
     const users = JSON.parse(localStorage.getItem("users"));
     const isSuccess = users && users.find(user => user.username === username && user.password === password);
     return isSuccess?.username ? isSuccess : null;

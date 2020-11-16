@@ -1,13 +1,14 @@
 import { Layout, Menu } from "antd";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { machineEvents } from "../statecharts/machine";
 
 const Navbar = () => {
   const { Header } = Layout;
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
-
+  const { current, sendEvent } = useContext(AuthContext);
+  const { isLoggedIn } = current.context;
   const handleLoginLogoutClick = () => {
-    setIsLoggedIn(!isLoggedIn);
+    sendEvent(isLoggedIn ? machineEvents.LOGOUT : machineEvents.GOTO_LOGIN);
   }
 
   return (

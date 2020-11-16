@@ -3,8 +3,10 @@ import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 const Dashboard = () => {
   
-    const { loggedInUser } = useContext(AuthContext);
+    const { current } = useContext(AuthContext);
   
+    const { loggedInUser } = current.context;
+
     return (
     <Card title={`Hello ${loggedInUser.username}`}>
         <Row gutter={16}>

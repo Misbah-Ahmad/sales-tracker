@@ -1,23 +1,18 @@
 import { Form, Input, Button, Checkbox, Card } from "antd";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { authorizeUser } from "../Data/repo";
+import { machineEvents } from "../statecharts/machine";
 
-const LoginForm = () => {
+const LoginForm = ({isLoading}) => {
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
   };
 
-  const { setIsLoggedIn, setLoggedInUser } = useContext(AuthContext);
+  const { sendEvent } = useContext(AuthContext);
 
   const attemptLogin = ({ username, password }) => {
     
-    const user = authorizeUser(username, password);
-
-    if (user) {
-      setLoggedInUser(user);
-      setIsLoggedIn(true);
-    }
+    sendEvent(machineEvents.LOGIN, {username, password})
 
   };
 
@@ -28,6 +23,7 @@ const LoginForm = () => {
         minWidth: "200px",
         maxWidth: "500px",
       }}
+      loading={isLoading}
       bodyStyle={{ padding: "30px" }}
       title="Login Form"
     >

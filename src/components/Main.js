@@ -7,7 +7,9 @@ import LoginForm from "./LoginForm";
 const Main = () => {
   const { Content } = Layout;
 
-  const { isLoggedIn } = useContext(AuthContext);
+  const { current } = useContext(AuthContext);
+  const { isLoggedIn } = current.context;
+  const isLoading = current.matches("LOGGING_IN");
 
   return (
     <Content style={{ margin: "0 16px" }}>
@@ -16,9 +18,9 @@ const Main = () => {
         style={{ padding: '24 px', minHeight: 360 }}
       >
 
-        {!isLoggedIn && <LoginForm />}
+        {!isLoggedIn && (current.matches("LOGIN_PAGE") || current.matches("LOGGING_IN")) && <LoginForm isLoading={isLoading} />}
 
-        {isLoggedIn && <Dashboard/>}
+        {isLoggedIn && current.matches("DASHBOARD") && <Dashboard/>}
       </div>
     </Content>
   );

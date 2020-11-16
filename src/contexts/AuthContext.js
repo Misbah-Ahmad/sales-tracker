@@ -1,25 +1,27 @@
-import { createContext, useEffect, useState } from "react";
-import { getIsLoggedIn, getLoggedInUser, saveIsLoggedIn, saveLoggedInUserInfo } from "../Data/repo";
+import { useMachine } from "@xstate/react";
+import { createContext, useEffect } from "react";
+import { saveIsLoggedIn, saveLoggedInUserInfo } from "../Data/repo";
+import appMachine from "../statecharts/machine";
 
 export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(getIsLoggedIn());
+    const [current, sendEvent] = useMachine(appMachine);
+
+    const {isLoggedIn, loggedInUser } = current.context;
+    console.log(current);
     useEffect(() => {
         saveIsLoggedIn(isLoggedIn);
-        if (!isLoggedIn) {
-            setLoggedInUser(null);
-        }
     }, [ isLoggedIn ]);
 
-    const [loggedInUser, setLoggedInUser] = useState(getLoggedInUser());
     useEffect(() => {
         saveLoggedInUserInfo(loggedInUser);
     }, [loggedInUser])
 
+
     return (
-        <AuthContext.Provider value={{isLoggedIn, setIsLoggedIn, loggedInUser, setLoggedInUser}}>
+        <AuthContext.Provider value={{ current, sendEvent }}>
             {props.children}
         </AuthContext.Provider>
      );
