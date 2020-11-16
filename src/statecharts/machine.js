@@ -21,6 +21,7 @@ const appMachine = new Machine(
     context: {
       isLoggedIn: getIsLoggedIn(),
       loggedInUser: getLoggedInUser(),
+      isCheckoutModalVisible: false,
     },
     initial: getInitialState(),
     states: {
@@ -56,7 +57,34 @@ const appMachine = new Machine(
             cond: "isLoggedIn",
             actions: assign({ isLoggedIn: false, loggedInUser: null }),
           },
-          GOTO_LOGIN: {},          
+          GOTO_LOGIN: {},
+          SEE_TODAY_REPORT: {
+            target: 'TODAY_REPORT',
+          },
+          ENTER_NEW_SALE: {
+            actions: assign({
+              isCheckoutModalVisible: true,
+            }),
+          },
+          CLOSE_NEW_SALE: {
+            actions: assign({
+              isCheckoutModalVisible: false,
+            }),
+          },          
+        },
+      },
+      TODAY_REPORT: {
+        on: {
+          ENTER_NEW_SALE: {
+            actions: assign({
+              isCheckoutModalVisible: true,
+            }),
+          },
+          CLOSE_NEW_SALE: {
+            actions: assign({
+              isCheckoutModalVisible: false,
+            }),
+          },
         },
       },
     },
@@ -76,4 +104,7 @@ export const machineEvents = {
   LOGIN: "LOGIN",
   LOGOUT: "LOGOUT",
   GOTO_LOGIN: "GOTO_LOGIN",
+  SEE_TODAY_REPORT: "SEE_TODAY_REPORT",
+  ENTER_NEW_SALE: "ENTER_NEW_SALE",
+  CLOSE_NEW_SALE: "CLOSE_NEW_SALE",  
 };
