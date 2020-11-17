@@ -14,7 +14,7 @@ const Dashboard = () => {
       title={`Hello ${loggedInUser.username}`}
     >
       <Row justify="space-around" style={{marginBottom: '16px'}}>
-      <Col span={6}>
+      <Col span={8}>
           <DashCard
             title="Today"
             earned="500"
@@ -23,7 +23,7 @@ const Dashboard = () => {
           />
         </Col>
 
-        <Col span={6}>
+        <Col span={8}>
           <DashCard
             title="This Month"
             earned="5000"
@@ -32,7 +32,7 @@ const Dashboard = () => {
           />
         </Col>
 
-        <Col span={6}>
+        <Col span={8}>
           <DashCard
             title="Total"
             earned="20000"
