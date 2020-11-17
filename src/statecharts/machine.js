@@ -22,7 +22,6 @@ const loginService = async (_context, event) => {
 };
 
 const insertNewSaleService = async (context, event) => {
-
   const newSale = await insertNewSale({
     ...event,
     userId: context.loggedInUser.id,
@@ -40,14 +39,21 @@ const newSaleMachine = {
     target: "NEW_SALE_FORM",
     actions: [
       assign({
-        salesData: getSalesData(),
-        operationResult: {success: true, message: "Saved New Data Successfully!"},
+        salesData: (context, _event) => {
+          return getSalesData(context.loggedInUser.id);
+        },
+        operationResult: {
+          success: true,
+          message: "Saved New Data Successfully!",
+        },
       }),
     ],
   },
   onError: {
     target: "NEW_SALE_FORM",
-    actions: assign({operationResult: {success: false, message: "Something Went Wrong!"},}),
+    actions: assign({
+      operationResult: { success: false, message: "Something Went Wrong!" },
+    }),
   },
 };
 
@@ -59,6 +65,7 @@ const appMachine = new Machine(
       loggedInUser: getLoggedInUser(),
       serviceList: getServiceList(),
       operationResult: null,
+      salesData: {},
     },
     initial: getInitialState(),
     states: {
@@ -80,6 +87,9 @@ const appMachine = new Machine(
             actions: assign({
               isLoggedIn: true,
               loggedInUser: (_context, event) => event.data,
+              salesData: (_context, event) => {
+                return getSalesData(event.data.id);
+              },
             }),
           },
           onError: {
@@ -106,13 +116,13 @@ const appMachine = new Machine(
       REPORT: {
         on: {
           ENTER_NEW_SALE: {
-            target: "NEW_SALE_FORM"
+            target: "NEW_SALE_FORM",
           },
           LOGOUT: {
             target: "LOGIN_PAGE",
             cond: "isLoggedIn",
             actions: assign({ isLoggedIn: false, loggedInUser: null }),
-          },          
+          },
           GOTO_DASHBOARD: {
             target: "DASHBOARD",
           },
@@ -132,7 +142,7 @@ const appMachine = new Machine(
             target: "LOGIN_PAGE",
             cond: "isLoggedIn",
             actions: assign({ isLoggedIn: false, loggedInUser: null }),
-          },  
+          },
         },
       },
       INSERTING_NEW_SALE: {
@@ -142,7 +152,7 @@ const appMachine = new Machine(
   },
   {
     actions: {
-      clearOperationMessage: assign({operationResult: null}),
+      clearOperationMessage: assign({ operationResult: null }),
     },
     guards: {
       isNotLoggedIn: (context, _event) => context.isLoggedIn === false,
