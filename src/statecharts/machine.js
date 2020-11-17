@@ -1,10 +1,16 @@
-import { authorizeUser, getIsLoggedIn, getLoggedInUser } from "../Data/repo";
+import {
+  authorizeUser,
+  getIsLoggedIn,
+  getLoggedInUser,
+  getSalesData,
+  getServiceList,
+  insertNewSale,
+} from "../Data/repo";
 
 const { Machine, assign } = require("xstate");
 
 const getInitialState = () => {
   const state = getIsLoggedIn() === true ? "DASHBOARD" : "LOGIN_PAGE";
-  console.log(state);
   return state;
 };
 const loginService = async (_context, event) => {
@@ -15,13 +21,44 @@ const loginService = async (_context, event) => {
   throw Error("Invalid Login Attempt");
 };
 
+const insertNewSaleService = async (context, event) => {
+
+  const newSale = await insertNewSale({
+    ...event,
+    userId: context.loggedInUser.id,
+  });
+  if (newSale && newSale.id) {
+    return newSale;
+  }
+  throw Error("Could not insert new sale");
+};
+
+const newSaleMachine = {
+  id: "newSale",
+  src: insertNewSaleService,
+  onDone: {
+    target: "NEW_SALE_FORM",
+    actions: [
+      assign({
+        salesData: getSalesData(),
+        operationResult: {success: true, message: "Saved New Data Successfully!"},
+      }),
+    ],
+  },
+  onError: {
+    target: "NEW_SALE_FORM",
+    actions: assign({operationResult: {success: false, message: "Something Went Wrong!"},}),
+  },
+};
+
 const appMachine = new Machine(
   {
     id: "app",
     context: {
       isLoggedIn: getIsLoggedIn(),
       loggedInUser: getLoggedInUser(),
-      isCheckoutModalVisible: false,
+      serviceList: getServiceList(),
+      operationResult: null,
     },
     initial: getInitialState(),
     states: {
@@ -58,39 +95,55 @@ const appMachine = new Machine(
             actions: assign({ isLoggedIn: false, loggedInUser: null }),
           },
           GOTO_LOGIN: {},
-          SEE_TODAY_REPORT: {
-            target: 'TODAY_REPORT',
+          SEE_REPORT: {
+            target: "REPORT",
           },
           ENTER_NEW_SALE: {
-            actions: assign({
-              isCheckoutModalVisible: true,
-            }),
+            target: "NEW_SALE_FORM",
           },
-          CLOSE_NEW_SALE: {
-            actions: assign({
-              isCheckoutModalVisible: false,
-            }),
-          },          
         },
       },
-      TODAY_REPORT: {
+      REPORT: {
         on: {
           ENTER_NEW_SALE: {
-            actions: assign({
-              isCheckoutModalVisible: true,
-            }),
+            target: "NEW_SALE_FORM"
           },
-          CLOSE_NEW_SALE: {
-            actions: assign({
-              isCheckoutModalVisible: false,
-            }),
+          LOGOUT: {
+            target: "LOGIN_PAGE",
+            cond: "isLoggedIn",
+            actions: assign({ isLoggedIn: false, loggedInUser: null }),
+          },          
+          GOTO_DASHBOARD: {
+            target: "DASHBOARD",
           },
         },
+      },
+      NEW_SALE_FORM: {
+        on: {
+          INSERT_NEW_SALE: {
+            target: "INSERTING_NEW_SALE",
+          },
+          CLEAR_MESSAGE: {
+            actions: "clearOperationMessage",
+          },
+          GOTO_DASHBOARD: "DASHBOARD",
+          SEE_REPORT: "REPORT",
+          LOGOUT: {
+            target: "LOGIN_PAGE",
+            cond: "isLoggedIn",
+            actions: assign({ isLoggedIn: false, loggedInUser: null }),
+          },  
+        },
+      },
+      INSERTING_NEW_SALE: {
+        invoke: newSaleMachine,
       },
     },
   },
   {
-    actions: {},
+    actions: {
+      clearOperationMessage: assign({operationResult: null}),
+    },
     guards: {
       isNotLoggedIn: (context, _event) => context.isLoggedIn === false,
       isLoggedIn: (context, _event) => context.isLoggedIn === true,
@@ -104,7 +157,9 @@ export const machineEvents = {
   LOGIN: "LOGIN",
   LOGOUT: "LOGOUT",
   GOTO_LOGIN: "GOTO_LOGIN",
-  SEE_TODAY_REPORT: "SEE_TODAY_REPORT",
+  SEE_REPORT: "SEE_REPORT",
   ENTER_NEW_SALE: "ENTER_NEW_SALE",
-  CLOSE_NEW_SALE: "CLOSE_NEW_SALE",  
+  GOTO_DASHBOARD: "GOTO_DASHBOARD",
+  INSERT_NEW_SALE: "INSERT_NEW_SALE",
+  CLEAR_MESSAGE: "CLEAR_MESSAGE",
 };

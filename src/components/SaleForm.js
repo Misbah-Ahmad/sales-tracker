@@ -1,54 +1,73 @@
-import { Modal, Input, Select, InputNumber, Button, message } from "antd";
-import { useContext, useState } from "react";
+import { Card, Input, Select, InputNumber, Button, message } from "antd";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { machineEvents } from "../statecharts/machine";
-const SaleForm = () => {
-  const { Option } = Select;
-  const { current, sendEvent } = useContext(AuthContext);
 
-  const [serviceName, setServiceName] = useState("Form");
-  const [price, setPrice] = useState(50);
+const SaleForm = ({isLoading}) => {
+
+  const { Option } = Select;
+
+  const { current, sendEvent } = useContext(AuthContext);
+  const { serviceList, loggedInUser, operationResult } = current.context;
+
+  const [selectedService, setselectedService] = useState(serviceList[0].key);
+  const [price, setPrice] = useState(parseInt((Math.random() * 100) + 50));
 
   const handleSubmit = () => {
-    setTimeout(() => {
-      sendEvent(machineEvents.CLOSE_NEW_SALE);
-    }, 2000);
+    if (!selectedService || typeof price != "number" || price < 1) {
+      message.error("Enter correct value please!");
+      return;
+    }
 
-    // if (!serviceName || !isNaN(price) || price < 1) {
-    //   message.error("Enter correct value please!");
-    //   return;
-    // }
+    const { userId } = loggedInUser;
+    sendEvent(machineEvents.INSERT_NEW_SALE, {
+      service: selectedService,
+      price,
+      userId,
+    });
   };
 
-  const { isCheckoutModalVisible } = current.context;
+  useEffect(() => {
+      const key = "key";
+      const duration = 3;
+      if (isLoading) {
+        message.loading({content: "Saving New Data", key})
+      } else if (!isLoading && operationResult && operationResult.message) {
+        if (operationResult.success) {
+          message.success({content: operationResult.message, key, duration});
+        } else {
+          message.error({content: operationResult.message, key, duration});
+        }
+        sendEvent(machineEvents.CLEAR_MESSAGE);
+      }
 
-  const handleCancel = () => {
-    sendEvent(machineEvents.CLOSE_NEW_SALE);
-  };
+  }, [operationResult, isLoading, sendEvent])
+
 
   return (
-    <Modal
-      visible={isCheckoutModalVisible}
+    <Card 
+      style={{
+        margin: "20px auto 20px auto",
+        minWidth: "200px",
+        maxWidth: "500px",
+        zIndex: 1,
+      }}
+      loading={isLoading}
+      bodyStyle={{ padding: "30px" }}
       title="Enter New Sale"
-      onOk={handleSubmit}
-      onCancel={handleCancel}
-      footer={[
-        <Button key="back" onClick={handleCancel}>
-          Cancel
-        </Button>,
-      ]}
     >
       <Input.Group compact>
         <Select
-          onChange={(value) => setServiceName(value)}
-          defaultValue={serviceName}
+          onChange={(value) => setselectedService(value)}
+          defaultValue={selectedService}
           style={{ width: "40%" }}
         >
-          <Option value="Form">Form Fillup</Option>
-          <Option value="Printing">Printing</Option>
-          <Option value="Type">Word Type</Option>
-          <Option value="CV">CV/Biodata</Option>
-          <Option value="Thesis">Thesis/Assignment</Option>
+          {serviceList &&
+            serviceList.map((service) => (
+              <Option key={service.key} value={service.key}>
+                {service.name}
+              </Option>
+            ))}
         </Select>
 
         <InputNumber
@@ -61,15 +80,11 @@ const SaleForm = () => {
           onChange={(value) => setPrice(value)}
         />
 
-        <Button
-          onClick={handleSubmit}
-          style={{ width: "20%" }}
-          type="primary"
-        >
+        <Button onClick={handleSubmit} style={{ width: "20%" }} type="primary">
           Submit
         </Button>
       </Input.Group>
-    </Modal>
+    </Card>
   );
 };
 

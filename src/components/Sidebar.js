@@ -1,6 +1,6 @@
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Button } from "antd";
 import { useContext, useState } from "react";
-import { PieChartOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { machineEvents } from "../statecharts/machine";
 import { AuthContext } from "../contexts/AuthContext";
 const Sidebar = () => {
@@ -26,27 +26,33 @@ const Sidebar = () => {
       >
         SalesTracker
       </div>
-      <Menu theme="light" mode="inline">
+      <Button
+        key="5"
+        style={{margin: '2px auto', fontWeight: 700}}
+        block={true}
+          onClick={() => sendEvent(machineEvents.ENTER_NEW_SALE)}
+          type="primary"
+          icon={<PlusOutlined />}
+          size="default"
+        >
+          New Sale
+        </Button>
+      <Menu defaultSelectedKeys={["1"]} theme="light" mode="inline">
+
         <Menu.Item
-          onClick={() => sendEvent(machineEvents.SEE_TODAY_REPORT)}
+          onClick={() => sendEvent(machineEvents.GOTO_DASHBOARD)}
           key="1"
-          icon={<PieChartOutlined />}
+        >
+          DASHBOARD
+        </Menu.Item>
+        <Menu.Item
+          onClick={() => sendEvent(machineEvents.SEE_REPORT)}
+          key="2"
         >
           Today
         </Menu.Item>
-        <Menu.Item key="2" icon={<PieChartOutlined />}>
-          This Month
-        </Menu.Item>
-        <Menu.Item key="3" icon={<PieChartOutlined />}>
-          Lifetime
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => sendEvent(machineEvents.ENTER_NEW_SALE)}
-          key="4"
-          icon={<PieChartOutlined />}
-        >
-          +New Sale
-        </Menu.Item>
+        <Menu.Item key="3">This Month</Menu.Item>
+        <Menu.Item key="4">Lifetime</Menu.Item>
       </Menu>
     </Sider>
   );
