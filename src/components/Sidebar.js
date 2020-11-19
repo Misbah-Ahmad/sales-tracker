@@ -26,9 +26,11 @@ const Sidebar = () => {
       >
         SalesTracker
       </div>
-      <Button
+
+      <Menu defaultSelectedKeys={["1"]} theme="light" mode="inline">
+      <Menu.Item
         key="5"
-        style={{margin: '2px auto', fontWeight: 700}}
+        style={{fontWeight: 700}}
         block={true}
           onClick={() => sendEvent(machineEvents.ENTER_NEW_SALE)}
           type="primary"
@@ -36,9 +38,7 @@ const Sidebar = () => {
           size="default"
         >
           New Sale
-        </Button>
-      <Menu defaultSelectedKeys={["1"]} theme="light" mode="inline">
-
+        </Menu.Item>
         <Menu.Item
           onClick={() => sendEvent(machineEvents.GOTO_DASHBOARD)}
           key="1"
