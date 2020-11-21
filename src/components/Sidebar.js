@@ -1,7 +1,8 @@
-import { Layout, Menu, Button } from "antd";
+import { Layout, Menu } from "antd";
 import { useContext, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { machineEvents } from "../statecharts/machine";
+import { reportTypes } from "../statecharts/utils";
 import { AuthContext } from "../contexts/AuthContext";
 const Sidebar = () => {
   const { Sider } = Layout;
@@ -31,7 +32,7 @@ const Sidebar = () => {
       <Menu.Item
         key="5"
         style={{fontWeight: 700}}
-        block={true}
+        block="true"
           onClick={() => sendEvent(machineEvents.ENTER_NEW_SALE)}
           type="primary"
           icon={<PlusOutlined />}
@@ -46,13 +47,17 @@ const Sidebar = () => {
           DASHBOARD
         </Menu.Item>
         <Menu.Item
-          onClick={() => sendEvent(machineEvents.SEE_REPORT)}
+          onClick={() => sendEvent(machineEvents.SEE_REPORT, {reportType: reportTypes.TODAY})}
           key="2"
         >
           Today
         </Menu.Item>
-        <Menu.Item key="3">This Month</Menu.Item>
-        <Menu.Item key="4">Lifetime</Menu.Item>
+        <Menu.Item
+          onClick={() => sendEvent(machineEvents.SEE_REPORT, {reportType: reportTypes.THIS_MONTH})}
+          key="3">This Month</Menu.Item>
+        <Menu.Item
+          onClick={() => sendEvent(machineEvents.SEE_REPORT, {reportType: reportTypes.LIFETIME})}
+          key="4">Lifetime</Menu.Item>
       </Menu>
     </Sider>
   );

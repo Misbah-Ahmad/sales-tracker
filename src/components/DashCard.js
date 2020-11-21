@@ -13,15 +13,15 @@ const DashCard = ({ title, earned, commission, paid }) => {
       </Row>
       <Row justify="space-around">
         <Col span={8}>
-          <Statistic valueStyle={statValueStyle} title="Earned" value={earned} />
+          <Statistic valueStyle={statValueStyle} title="Earned" value={`৳ ${earned}`} />
         </Col>
 
         <Col span={8}>
-          <Statistic valueStyle={statValueStyle} title="Commission" value={commission} />
+          <Statistic valueStyle={statValueStyle} title="Commission" value={`৳ ${commission}`} />
         </Col>
 
         <Col span={8}>
-          <Statistic valueStyle={statValueStyle} title="Paid" value={paid} />
+          <Statistic valueStyle={statValueStyle} title="Paid" value={`৳ ${paid}`} />
         </Col>
       </Row>
       </>

@@ -3,6 +3,7 @@ import {
   getIsLoggedIn,
   getLoggedInUser,
   getSalesData,
+  getSegmentedSalesData,
   getServiceList,
   insertNewSale,
 } from "../Data/repo";
@@ -66,6 +67,8 @@ const appMachine = new Machine(
       serviceList: getServiceList(),
       operationResult: null,
       salesData: {},
+      reportType: "",
+      segmentedSalesData: [],
     },
     initial: getInitialState(),
     states: {
@@ -107,6 +110,10 @@ const appMachine = new Machine(
           GOTO_LOGIN: {},
           SEE_REPORT: {
             target: "REPORT",
+            actions: assign({
+              reportType: (_context, event) => event.reportType,
+              segmentedSalesData: (context, event) => getSegmentedSalesData(context.loggedInUser.id, event.reportType),
+            }),
           },
           ENTER_NEW_SALE: {
             target: "NEW_SALE_FORM",
@@ -123,6 +130,13 @@ const appMachine = new Machine(
             cond: "isLoggedIn",
             actions: assign({ isLoggedIn: false, loggedInUser: null }),
           },
+          SEE_REPORT: {
+            target: "REPORT",
+            actions: assign({
+              reportType: (_context, event) => event.reportType,
+              segmentedSalesData: (context, event) => getSegmentedSalesData(context.loggedInUser.id, event.reportType),
+            }),
+          },
           GOTO_DASHBOARD: {
             target: "DASHBOARD",
           },
@@ -136,8 +150,14 @@ const appMachine = new Machine(
           CLEAR_MESSAGE: {
             actions: "clearOperationMessage",
           },
+          SEE_REPORT: {
+            target: "REPORT",
+            actions: assign({
+              reportType: (_context, event) => event.reportType,
+              segmentedSalesData: (context, event) => getSegmentedSalesData(context.loggedInUser.id, event.reportType),
+            }),
+          },
           GOTO_DASHBOARD: "DASHBOARD",
-          SEE_REPORT: "REPORT",
           LOGOUT: {
             target: "LOGIN_PAGE",
             cond: "isLoggedIn",

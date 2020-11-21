@@ -1,4 +1,5 @@
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
+import { reportTypes } from "../statecharts/utils";
 import { machineStates } from "../statecharts/states";
 
 const storageKeys = {
@@ -37,7 +38,6 @@ export const getLoggedInUser = () => {
 };
 
 export const authorizeUser = async (username, password) => {
-
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const users = JSON.parse(localStorage.getItem("users"));
@@ -67,9 +67,8 @@ export const getServiceList = () => {
   return services ? services : insertServices();
 };
 
-export const insertNewSale = async ({service, price, userId}) => {
-
-  await new Promise(resolve => setTimeout(resolve, 2000));
+export const insertNewSale = async ({ service, price, userId }) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const newSale = {
     id: uuid(),
@@ -89,25 +88,84 @@ export const insertNewSale = async ({service, price, userId}) => {
 
   localStorage.setItem(storageKeys.SALES, JSON.stringify(sales));
   return newSale;
-}
+};
+
+const parseSaleDataDateTimeCallback = (data) => {
+  const saleDate = new Date(data.datetime);
+  data["date"] = {
+    day: saleDate.getDate(),
+    month: saleDate.getMonth(),
+    year: saleDate.getFullYear(),
+  };
+  data[
+    "time"
+  ] = `${saleDate.getHours()}:${saleDate.getMinutes()}:${saleDate.getSeconds()}`;
+  return data;
+};
 
 export const getSalesData = (userId) => {
   let salesData = JSON.parse(localStorage.getItem(storageKeys.SALES));
-
+  console.log(salesData);
   if (salesData && Array.isArray) {
-    salesData = salesData.filter(data => data.userId === userId);
-    salesData = {sales: salesData};
+    salesData = salesData
+      .filter((data) => data.userId === userId).map(parseSaleDataDateTimeCallback);
+      console.log("Second");
+      console.log(salesData);
+      salesData = { sales: salesData };
   } else {
-    salesData = {sales: []};
+    salesData = { sales: [] };
   }
 
   return salesData;
+};
+
+
+const getSalesDateType = (singleSale) => {
+    const thisDate = new Date().getDate();
+    const thisMonth = new Date().getMonth();
+    const thisYear = new Date().getFullYear();
+    const { day, month, year } = singleSale.date;
+
+    if (year === thisYear && month === thisMonth && day === thisDate) {
+      return reportTypes.TODAY;
+    } else if (year === thisYear && month === thisMonth) {
+      return reportTypes.THIS_MONTH;
+    } else {
+      return reportTypes.LIFETIME;
+    }
 }
+
+export const getSegmentedSalesData = (userId, reportType) => {
+
+  if (reportTypes.LIFETIME === reportType) {
+    return getSalesData(userId).sales;
+  }
+
+  return getSalesData(userId).sales.filter(singleSale => getSalesDateType(singleSale) === reportType);
+
+}
+
+// export salesDataMonthFilter = (data, month) => {
+//   return data.filter(item => data.date.month === month);
+// }
+// export salesDataDateFilter = (data, month, date, year) => {
+//   return data.filter(item => data.date.month === month && data.date.day === date && data.date.year === year);
+// }
+
+// export const calculateSalesData = (data) => {
+//   return data.reduce((acc, {earned, com}) => {
+//     return {acc.earned += item.earned;
+//     acc.paid += item.paid;
+//     acc.commission += item.commission;
+
+// }, {earned: 0, paid: 0, commission: 0})
+// };
 
 export const getPreviousState = () => {
   let pState = localStorage.getItem(storageKeys.PREVIOUS_STATE);
   console.log(pState);
   return machineStates.includes(pState) ? pState : "DASHBOARD";
-}
+};
 
-export const setPreviousState = state => localStorage.setItem(storageKeys.PREVIOUS_STATE, state);
+export const setPreviousState = (state) =>
+  localStorage.setItem(storageKeys.PREVIOUS_STATE, state);
