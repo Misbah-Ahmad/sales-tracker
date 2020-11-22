@@ -13,28 +13,28 @@ const SaleHistory = () => {
       dateObject.getMonth() + 1
     }/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
 
-  const data = segmentedSalesData.map((item) => {
-    const { service, price, charge } = item;
+  const data = segmentedSalesData.map(({id, service, price, charge, datetime }) => {
+
     return {
-      key: item.id,
+      key: id,
       service,
       price,
       charge,
-      datetime: formatDateTime(new Date(item.datetime)),
+      datetime: formatDateTime(new Date(datetime)),
     };
   });
 
   const onChange = (pagination, filters, sorter, extra) => {
-    console.log("params", pagination, filters, sorter, extra);
+    // console.log("params", pagination, filters, sorter, extra);
   };
 
   return (
     <Card
       style={{ margin: "20px auto" }}
       headStyle={{ fontWeight: 700 }}
-      title="Sales Report"
+      title="Sales History"
     >
-      <Table columns={columns} dataSource={data} onChange={onChange} />
+      <Table bordered={true} columns={columns} dataSource={data} onChange={onChange} />
     </Card>
   );
 };
